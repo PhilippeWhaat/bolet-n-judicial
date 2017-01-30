@@ -3,8 +3,8 @@
 require 'sendgrid-ruby'
 require 'open-uri'
 
-#date = "%02d%02d%d1" % [Date.today.day, Date.today.month, Date.today.year]
-date = "%02d%02d%d1" % [20, Date.today.month, Date.today.year]
+date = "%02d%02d%d1" % [Date.today.day, Date.today.month, Date.today.year]
+#date = "%02d%02d%d1" % [20, Date.today.month, Date.today.year]
 
 filename = "pdfs/#{date}.pdf"
 unlocked_filename = "pdfs/#{date}_unlocked.pdf"
@@ -29,23 +29,33 @@ entries = text.scan(/.*?Exp\. \d+\/\d+\.?/m)
 
 output = ''
 
+#START OF TEAM SEARCH
 searches = File.read('search.txt').split("\n").reject { |c| c.empty? }
 searches.map! { |s| s.split(",") }
+acdo = 0
+output += "LISTA DE ACUERDOS PARA EL EQUIPO 1\n\n"
 
 searches.each { |s|
-  output += "Busqueda de '#{s[0]}' con numero de expediente #{s[1]} (#{s[2]}):\n\n"
-  filtered = entries.select { |e| e.downcase.include? s[0].downcase and e.include? s[1]}
-  output += " #{ filtered.count }"
-  output += filtered.join "\n\n"
-  output += "\n\n\n"
+  filtered = entries.select { |e| e.downcase.include? s[0].downcase.encode("ISO-8859-1") and e.include? s[1]}
+  if filtered.count!=0
+  	output += "Resultado por '#{s[0]}' Núm. Exp. #{s[1]} (#{s[2]} SEC. #{s[3]}):\n\n".encode("ISO-8859-1"); output.encode("UTF-8")
+  	output += " #{ filtered.count }"
+  	output += filtered.join "\n\n"
+  	output += "\n\n\n"
+  	acdo = acdo+1
+  end
 }
+if acdo ==0
+  	output += "No se ha encontrado ningún acuerdo\n\n".encode("ISO-8859-1"); output.encode("UTF-8")
+end
+#END OF TEAM SEARCH
 
 puts output
 
 include SendGrid
 
-from = Email.new(email: 'bjgs-up@up.edu.mx')
-subject = 'Lista de acuerdos del dia %02d/%02d/%d' % [Date.today.day, Date.today.month, Date.today.year]
+from = Email.new(email: 'BJGS-UP@up.edu.mx')
+subject = 'Lista de acuerdos del %02d/%02d/%d' % [Date.today.day, Date.today.month, Date.today.year]
 to = Email.new(email: 'philippe.tritto@gmail.com')
 content = Content.new(type: 'text/plain', value: output)
 mail = Mail.new(from, subject, to, content)
@@ -59,3 +69,5 @@ puts response.status_code
 puts response.body
 puts response.headers
 
+File.delete("pdfs/#{date}.pdf")
+File.delete("pdfs/#{date}_unlocked.pdf")
