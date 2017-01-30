@@ -33,8 +33,8 @@ searches = File.read('search.txt').split("\n").reject { |c| c.empty? }
 searches.map! { |s| s.split(",") }
 
 searches.each { |s|
-  output += "Searching for '#{s[0]}' with Exp. Num #{s[1]}:\n\n"
-  filtered = entries.select { |e| e.include? s[0] and e.include? s[1]}
+  output += "Busqueda de '#{s[0]}' con numero de expediente #{s[1]} (#{s[2]}):\n\n"
+  filtered = entries.select { |e| e.downcase.include? s[0].downcase and e.include? s[1]}
   output += " #{ filtered.count }"
   output += filtered.join "\n\n"
   output += "\n\n\n"
@@ -44,8 +44,8 @@ puts output
 
 include SendGrid
 
-from = Email.new(email: 'philippe.tritto@gmail.com')
-subject = 'Hello World from the SendGrid Ruby Library!'
+from = Email.new(email: 'bjgs-up@up.edu.mx')
+subject = 'Lista de acuerdos del dia %02d/%02d/%d' % [Date.today.day, Date.today.month, Date.today.year]
 to = Email.new(email: 'philippe.tritto@gmail.com')
 content = Content.new(type: 'text/plain', value: output)
 mail = Mail.new(from, subject, to, content)
