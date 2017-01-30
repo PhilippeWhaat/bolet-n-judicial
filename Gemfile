@@ -1,5 +1,6 @@
 
 source 'https://rubygems.org'
 
-gem 'pdf-reaer'
+gem 'sendgrid-ruby'
+
 

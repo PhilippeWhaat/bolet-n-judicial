@@ -1,13 +1,15 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    pdf-toolkit (1.1.0)
+    ruby_http_client (3.0.1)
+    sendgrid-ruby (4.0.7)
+      ruby_http_client (~> 3.0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  pdf-toolkit
+  sendgrid-ruby
 
 BUNDLED WITH
    1.14.3
